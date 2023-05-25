@@ -1,0 +1,573 @@
+<?xml version="1.0"?>
+<AlteryxDocument yxmdVer="2023.1">
+  <Nodes>
+    <Node ToolID="9">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.Union.Union">
+        <Position x="331" y="187" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <ByName_ErrorMode>Ignore</ByName_ErrorMode>
+          <ByName_OutputMode>Subset</ByName_OutputMode>
+          <Mode>ByName</Mode>
+          <SetOutputOrder value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxUnion" />
+    </Node>
+    <Node ToolID="10">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+        <Position x="415" y="187" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <OrderChanged value="False" />
+          <CommaDecimal value="False" />
+          <SelectFields>
+            <SelectField field="*Unknown" selected="True" />
+          </SelectFields>
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+    </Node>
+    <Node ToolID="11">
+      <GuiSettings Plugin="AlteryxBasePluginsGui.BrowseV2.BrowseV2">
+        <Position x="511" y="187" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <TempFile>C:\ProgramData\Alteryx\Engine\Engine_8992_488782ca807aa84d996bcd3d71f7906d_\Engine_8992_f2f24d62dea03f469d649cf5bed6720b~.yxdb</TempFile>
+          <TempFileDataProfiling />
+          <Layout>
+            <ViewMode>Single</ViewMode>
+            <ViewSize value="100" />
+            <View1>
+              <DefaultTab>Perfil</DefaultTab>
+              <Hints>
+                <Table />
+              </Hints>
+            </View1>
+            <View2 />
+          </Layout>
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxBrowseV2" />
+    </Node>
+    <Node ToolID="8">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="54" y="246" width="205" height="133" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Boticario</Caption>
+          <Style TextColor="#314c4a" FillColor="#80ff80" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <AnnotationText>Boticario</AnnotationText>
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="5">
+          <GuiSettings Plugin="JupyterCode">
+            <Position x="79" y="295" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <WorkflowName>c:\users\leand\onedrive - mirow\mirow &amp; co\06_knowledge\06_reach &amp; relevance\03_specific client development\36_natura\20230504_proposta webscraper\05_projeto\03_fluxo alteryx\webscraper.yxmd</WorkflowName>
+              <JupyterProduction>false</JupyterProduction>
+              <vEnvName>designerbasetools_venv</vEnvName>
+              <DefaultVenv>1</DefaultVenv>
+              <productionModeScript />
+              <Port>50084</Port>
+              <JupyterGuidDir>8a32034642760c47ec1e81a5af630718</JupyterGuidDir>
+              <JupyterGuidCopy />
+              <LastExecutedByEngineVersion>2023.1.1.123</LastExecutedByEngineVersion>
+              <Notebook><![CDATA[{"cells":[{"cell_type":"markdown","metadata":{"ayx":{"cell_class":"text_cell","cell_css":"border: 3px solid #357; margin: 4px; background: #fbffff","cell_type":"markdown","contents_keyword":"Alteryx.help()","first_line":"Run `Alteryx.help()` for info about useful functions.","label":"info"}},"source":["Run `Alteryx.help()` for info about useful functions.  \n","i.e., `Alteryx.read(\"#1\")`, `Alteryx.write(df,1)`, `Alteryx.getWorkflowConstant(\"Engine.WorkflowDirectory\")`"]},{"cell_type":"code","execution_count":1,"metadata":{"ayx":{"cell_class":"code_cell","cell_css":"border: 1px solid #58a; margin: 2px;","cell_type":"code","contents_keyword":"installPackages","first_line":"# List all non-standard packages to be imported by your","label":"deps"}},"outputs":[],"source":["# List all non-standard packages to be imported by your \n","# script here (only missing packages will be installed)\n","from ayx import Package\n","#Package.installPackages(['pandas','numpy'])"]},{"cell_type":"code","execution_count":2,"metadata":{},"outputs":[],"source":["from ayx import Alteryx\n","import numpy as np\n","import pandas as pd\n","from requests_html import HTMLSession\n","from bs4 import BeautifulSoup\n","from datetime import date, datetime\n","import re\n","import json"]},{"cell_type":"code","execution_count":3,"metadata":{},"outputs":[],"source":["debug_mode = False"]},{"cell_type":"markdown","metadata":{},"source":["# Mapeando a árvore de URLs"]},{"cell_type":"code","execution_count":4,"metadata":{},"outputs":[],"source":["def filter_links(links, link_blacklist, base_url):\n","\n","    passlist = [l for l in links if not any(xl in l for xl in link_blacklist)] # Filtra links que contem texto constante na blacklist    \n","    filtered_list = []\n","    discarded_list = []\n","    \n","    for i in passlist:\n","        if (len(i) <= 1) or i == base_url: # Descarta se for so uma barra ou o url base do boticario\n","            discarded_list.append(i)\n","        elif i[:len(base_url)] == base_url: # Mantem se for um url do boticario\n","            filtered_list.append(i)\n","        elif i[:4] == 'http':\n","            discarded_list.append(i)\n","        elif i[0] == '/': # Monta o url completo\n","            filtered_list.append(base_url+i)\n","        elif i[0] != '/': # Monta o url completo\n","            filtered_list.append(base_url+'/'+i)\n","        else:\n","            discarded_list.append(i)\n","\n","    return filtered_list"]},{"cell_type":"code","execution_count":5,"metadata":{},"outputs":[],"source":["def get_filtered_links(session, seed_url, base_url, link_blacklist):\n","    r = session.get(seed_url)\n","\n","    return filter_links(r.html.links, link_blacklist, base_url)"]},{"cell_type":"code","execution_count":6,"metadata":{},"outputs":[],"source":["def link_type(session, link):\n","    r = session.get(link)\n","    soup = BeautifulSoup(r.text, \"html.parser\")\n","    page_type = 'Unknown'\n","\n","    try:\n","        script = soup.find_all(\"script\")[1]\n","        pattern = re.compile(\"blz.pageType = (.*?);\") # Acha essa variavel entre os elementos com tag script\n","        page_type = pattern.findall(script.string)[0].replace(\"'\",\"\") # Remove aspas simples do texto\n","\n","    except Exception as e:\n","        if debug_mode: print(e)\n","    \n","    return page_type"]},{"cell_type":"code","execution_count":7,"metadata":{},"outputs":[],"source":["def new_link(link, product_set, discard_set): # Verifica se o link ja foi visto ou nao\n","    new = not(link in product_set or link in discard_set)\n","    \n","    return new"]},{"cell_type":"code","execution_count":8,"metadata":{},"outputs":[],"source":["def product_mapper(session, base_url, seed_links, link_type_blacklist, link_blacklist, product_max):\n","    product_set = set() # Pilha de produtos\n","    discard_set = set() # Pilha de descarte\n","    seed_set = set(seed_links) # Pilha de links\n"," \n","    while (len(seed_set) > 0) and (len(product_set) < product_max):\n","        link = seed_set.pop() # Pega o primeiro link da lista\n","        new = new_link(link, product_set, discard_set)\n","        \n","        if debug_mode:\n","            print(\"---------------------------------------\")\n","            print(\"Product stack: \", len(product_set))\n","            print(\"Discard stack: \", len(discard_set))\n","            print(\"Link stack: \", len(seed_set))\n","            print(\"Current link: \", link)\n","            print(\"New link: \", new)\n","\n","        if new: # Continua so se for um link novo\n","            lk_type = link_type(session, link) # E pega seu tipo\n","\n","            if debug_mode:\n","                print(\"Link type: \", lk_type)\n","\n","            if lk_type not in link_type_blacklist: # Continua so se nao for um dos tipos no blacklist,\n","\n","                if lk_type == \"Produto\": # Se for um produto\n","                    product_set.add(link) # Coloca na pilha de produtos\n","                    \n","                    if debug_mode:\n","                        print(\"Link added to product stack\")\n","\n","                else: # Se nao for um produto (pode ser Categoria, SubCategoria, Landing, Linha, Marca, etc.)\n","                    potential_links = get_filtered_links(session, link, base_url, link_blacklist) # Lista os links dentro dele\n","                    \n","                    new_links = [l for l in potential_links if new_link(l, product_set, discard_set)] # Destes, pega apenas os novos\n","                    \n","                    old_size = len(seed_set)\n","                    for nl in new_links:            \n","                        seed_set.add(nl) # Adiciona links novos aa lista principal\n","                    new_size = len(seed_set)\n","\n","                    if debug_mode:\n","                        print(new_size-old_size, \" new links added to link stack\")\n","\n","        discard_set.add(link) # Adiciona link que acabamos de ver aa pilha de descarte\n","\n","    return product_set"]},{"cell_type":"markdown","metadata":{},"source":["# Pegando dados de um único produto\n","\n","Dados desejados:\n","- País\n","- Concorrente\n","- Data scrape\n","- ID produto\n","- Título\n","- Descrição\n","- Preço atual\n","- Preço antigo\n","- Desconto atual\n","- Moeda\n","- Disponibilidade\n","- Condição\n","- Departamento\n","- Categoria\n","- Marca\n","- Linha\n","- URL"]},{"cell_type":"code","execution_count":9,"metadata":{},"outputs":[],"source":["def get_item_data(session, link): # A partir da pagina do item, busca todas suas informacoes pertinentes\n","    r = session.get(link)\n","    \n","    item = BeautifulSoup(r.text, \"html.parser\").head # Maior parte dos dados esta na seção 'head', sobe o 'parent' se precisar de algo de fora\n","    \n","    pais = \"Brasil\"\n","    competidor = \"O Boticario\"\n","    data = date.today().strftime(\"%d/%m/%Y\")\n","\n","    # Description\n","    try:\n","        description = item.find(\"meta\", {\"property\":\"og:description\"}).attrs[\"content\"]\n","    except Exception as e:\n","        description = None\n","        if debug_mode:print(e)\n","    \n","    # Availability\n","    try:\n","        availability = item.find(\"meta\", {\"property\":\"product:availability\"}).attrs[\"content\"]\n","    except Exception as e:\n","        availability = None\n","        if debug_mode:print(e)\n","\n","    # Condition\n","    try:\n","        condition = item.find(\"meta\", {\"property\":\"product:condition\"}).attrs[\"content\"]\n","    except Exception as e:\n","        condition = None\n","        if debug_mode:print(e)\n","\n","    # Price\n","    try:\n","        price = item.find(\"meta\", {\"property\":\"product:price:amount\"}).attrs[\"content\"]\n","        price = float(price)\n","    except Exception as e:\n","        price = None\n","        if debug_mode:print(e)\n","\n","    # Currency\n","    try:\n","        currency = item.find(\"meta\", {\"property\":\"product:price:currency\"}).attrs[\"content\"]\n","    except Exception as e:\n","        currency = None\n","        if debug_mode:print(e)\n","    \n","    # ID\n","    try:\n","        id = item.find(\"meta\", {\"property\":\"product:retailer_item_id\"}).attrs[\"content\"]\n","    except Exception as e:\n","        id = None\n","        if debug_mode:print(e)\n","\n","    # Title\n","    try:\n","        title = item.find(\"meta\", {\"property\":\"og:title\"}).attrs[\"content\"].split(\"|\")[0].strip()\n","    except Exception as e:\n","        title = None\n","        if debug_mode:print(e)\n","        \n","    # URL\n","    try:\n","        url = item.find(\"meta\", {\"property\":\"og:url\"}).attrs[\"content\"]\n","    except Exception as e:\n","        url = None\n","        if debug_mode:print(e)\n","        \n","    # MaxPrice\n","    try:\n","        maxprice = item.parent.find(\"strong\", {\"class\": \"nproduct-price-max\"}).s.text.strip().strip(\"R$\").strip().replace(',','.')\n","        maxprice = float(maxprice)\n","    except Exception as e:\n","        maxprice = None\n","        if debug_mode:print(e)\n","\n","    # Outros atributos\n","    pattern = re.compile(\"blz.globals.pageTree = (.*?);\") # Acha essa variavel entre os elementos com tag script\n","\n","    scripts = item.parent.find_all('script')[1] # Variável fica no segundo bloco 'script', serve para tracking do Google Tag Manager\n","\n","    patt = pattern.findall(scripts.string)[0]\n","    attr = json.loads(patt) # Transforma em JSON para facilitar a conversao\n","\n","    # Departamento\n","    try:\n","        departamento = attr['department']\n","    except Exception as e:\n","        departamento = None\n","        if debug_mode:print(e)\n","        \n","    # Categoria\n","    try:\n","        categoria = attr['category']\n","    except Exception as e:\n","        categoria = None\n","        if debug_mode:print(e)\n","\n","    # Marca\n","    try:\n","        marca = attr['brand']\n","    except Exception as e:\n","        marca = None\n","        if debug_mode:print(e)\n","        \n","    # Linha\n","    try:\n","        linha = attr['brandLine']\n","    except Exception as e:\n","        linha = None\n","        if debug_mode:print(e)\n","        \n","    # Demais atributos\n","    try:\n","        atributos = attr['attributes'] # Esses aqui são um dict dentro do JSON, crio um novo dict simplificado a partir deste\n","        tempDict = {}\n","        for i in atributos:\n","            k = i['name']\n","\n","            v = []\n","            for j in i['values']:\n","                v.append(j['name'])\n","\n","            tempDict[k] = \",\".join(v)\n","    except Exception as e:\n","        tempDict = {}\n","        if debug_mode:print(e)\n","            \n","    d = {\t\n","            \"País\":pais,\n","            \"Concorrente\":competidor,\n","            \"Data scrape\":data,\n","            \"ID produto\":id,\n","            \"Título\":title,\n","            \"Descrição\":description,\n","            \"Preço atual\":price,\n","            \"Preço antigo\":maxprice,\n","            \"Moeda\":currency,\n","            \"Disponibilidade\":availability,\n","            \"Condição\":condition,\n","            \"Departamento\":departamento,\n","            \"Categoria\":categoria,\n","            \"Marca\":marca,\n","            \"Linha\":linha,\n","            \"URL\":url\n","        }\n","\n","    d.update(tempDict) # Inclui demais atributos\n","\n","    return pd.Series(d)"]},{"cell_type":"code","execution_count":10,"metadata":{},"outputs":[],"source":["def get_all_items(session, links):\n","    df = pd.DataFrame()\n","    for link in links:\n","        try:\n","            item_data = get_item_data(session, link)\n","            df = df.append(item_data, ignore_index=True)\n","        except Exception as e:\n","            if debug_mode: print(e)\n","    return df"]},{"cell_type":"markdown","metadata":{},"source":["# Função Main"]},{"cell_type":"code","execution_count":11,"metadata":{},"outputs":[],"source":["#10_000_000\n","def main(product_max = 10_000_000):\n","    \n","    session = HTMLSession()\n","    base_url = \"https://www.boticario.com.br\"\n","    seed_url = \"https://www.boticario.com.br/institucional/mapasite/\"\n","\n","    link_blacklist = ['atendimento','autenticacao','compre-pelo-whatsapp','institucional','minha-conta','nossa-historia','sacola','dicas-de-beleza','clube','?']\n","    link_type_blacklist = ['Institucional', 'Unknown', 'quiz-giftable']\n","\n","    # Scraping\n","    seed_links = get_filtered_links(session, seed_url, base_url, link_blacklist)\n","\n","    products = product_mapper(session, base_url, seed_links, link_type_blacklist, link_blacklist, product_max)\n","\n","#    df2 = pd.read_excel(\"../2023_05_18_boticario.xlsx\")\n","#    products = df2['URL'].to_list()\n","    \n","    df = get_all_items(session, products)\n","    \n","    # Reordenando\n","    first = ['País', 'Concorrente', 'Data scrape', 'ID produto', 'Título', 'Descrição', 'Preço atual', 'Preço antigo', 'Moeda', 'Disponibilidade', 'Condição', 'Departamento', 'Categoria', 'Marca', 'Linha', 'URL']\n","    cols = first + sorted([c for c in df.columns.to_list() if c not in first])   \n","\n","    try:\n","        df = df[cols]\n","    except Exception as e:\n","        if debug_mode: print(e)\n","    \n","    return df\n","    #df.to_excel(\"../02_Results/\"+date.today().strftime(\"%Y_%m_%d\")+\"_\"+\"boticario.xlsx\")"]},{"cell_type":"code","execution_count":12,"metadata":{},"outputs":[],"source":["df=main()"]},{"cell_type":"code","execution_count":13,"metadata":{},"outputs":[],"source":["Alteryx.write(df,1)"]}],"metadata":{"kernelspec":{"display_name":"designerbasetools_venv","language":"python","name":"designerbasetools_venv"},"language_info":{"codemirror_mode":{"name":"ipython","version":3},"file_extension":".py","mimetype":"text/x-python","name":"python","nbconvert_exporter":"python","pygments_lexer":"ipython3","version":"3.8.5"}},"nbformat":4,"nbformat_minor":2}]]></Notebook>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output1">
+              <RecordInfo>
+                <Field name="País" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Concorrente" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Data scrape" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="ID produto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Título" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Descrição" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Preço atual" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Preço antigo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Moeda" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Disponibilidade" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condição" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Departamento" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Categoria" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Marca" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Linha" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="URL" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Acabamento" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ação" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Caracteristíca Escova" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Casa" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cobertura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Concentração" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condição dos Fios" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Controle" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Desejo de Beleza" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Família Olfativa" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Fator" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Fios" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Fundo de Cor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Gênero" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="ITENS" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Itens2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ocasião" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Perfil" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Produto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Produtos para" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Propriedades" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="PÚBLICO" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Público2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Subfamílias" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="TIPOS" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tamanho" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Textura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de Filtro" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de Pele" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipos2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipos de Cabelo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tonalidade" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Uso" size="1073741823" source="PythonTool:" type="V_WString" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxJupyterPluginEngine.dll" EngineDllEntryPoint="AlteryxJupyter" />
+        </Node>
+        <Node ToolID="6">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="175" y="295" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="False" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="Textura" selected="False" />
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+      </ChildNodes>
+    </Node>
+    <Node ToolID="3">
+      <GuiSettings Plugin="AlteryxGuiToolkit.ToolContainer.ToolContainer">
+        <Position x="54" y="54" width="205" height="133" />
+      </GuiSettings>
+      <Properties>
+        <Configuration>
+          <Caption>Falabella</Caption>
+          <Style TextColor="#314c4a" FillColor="#ff80ff" BorderColor="#314c4a" Transparency="25" Margin="25" />
+          <Disabled value="False" />
+          <Folded value="False" />
+        </Configuration>
+        <Annotation DisplayMode="0">
+          <Name />
+          <AnnotationText>Falabella</AnnotationText>
+          <DefaultAnnotationText />
+          <Left value="False" />
+        </Annotation>
+      </Properties>
+      <ChildNodes>
+        <Node ToolID="1">
+          <GuiSettings Plugin="JupyterCode">
+            <Position x="79" y="103" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <WorkflowName>c:\users\leand\onedrive - mirow\mirow &amp; co\06_knowledge\06_reach &amp; relevance\03_specific client development\36_natura\20230504_proposta webscraper\05_projeto\03_fluxo alteryx\webscraper.yxmd</WorkflowName>
+              <JupyterProduction>false</JupyterProduction>
+              <vEnvName>designerbasetools_venv</vEnvName>
+              <DefaultVenv>1</DefaultVenv>
+              <productionModeScript />
+              <Port>50084</Port>
+              <JupyterGuidDir>901a8f4ee0aefbdc81617c314f09ad8e</JupyterGuidDir>
+              <JupyterGuidCopy />
+              <LastExecutedByEngineVersion>2023.1.1.123</LastExecutedByEngineVersion>
+              <Notebook><![CDATA[{"cells":[{"cell_type":"markdown","metadata":{"ayx":{"cell_class":"text_cell","cell_css":"border: 3px solid #357; margin: 4px; background: #fbffff","cell_type":"markdown","contents_keyword":"Alteryx.help()","first_line":"Run `Alteryx.help()` for info about useful functions.","label":"info"}},"source":["Run `Alteryx.help()` for info about useful functions.  \n","i.e., `Alteryx.read(\"#1\")`, `Alteryx.write(df,1)`, `Alteryx.getWorkflowConstant(\"Engine.WorkflowDirectory\")`"]},{"cell_type":"code","execution_count":1,"metadata":{"ayx":{"cell_class":"code_cell","cell_css":"border: 1px solid #58a; margin: 2px;","cell_type":"code","contents_keyword":"installPackages","first_line":"# List all non-standard packages to be imported by your","label":"deps"}},"outputs":[],"source":["# List all non-standard packages to be imported by your \n","# script here (only missing packages will be installed)\n","from ayx import Package\n","#Package.installPackages(['pandas','numpy'])"]},{"cell_type":"code","execution_count":2,"metadata":{},"outputs":[],"source":["#!pip install nest-asyncio"]},{"cell_type":"code","execution_count":3,"metadata":{},"outputs":[],"source":["from ayx import Alteryx\n","import numpy as np\n","import pandas as pd\n","from requests_html import HTMLSession#, AsyncHTMLSession\n","from bs4 import BeautifulSoup\n","from datetime import date\n","import re\n","import json\n","from urllib.parse import unquote"]},{"cell_type":"code","execution_count":4,"metadata":{},"outputs":[],"source":["debug_mode = False"]},{"cell_type":"code","execution_count":5,"metadata":{},"outputs":[],"source":["#import nest_asyncio\n","#nest_asyncio.apply()\n","\n","#r = await asession.get(links[0])\n","#await r.html.arender(scrolldown=True)"]},{"cell_type":"markdown","metadata":{},"source":["# Mapeando a árvore de URLs"]},{"cell_type":"code","execution_count":6,"metadata":{},"outputs":[],"source":["def filter_links(links, link_blacklist, base_url):\n","\n","    passlist = [l for l in links if not any(xl in l for xl in link_blacklist)] # Filtra links que contem texto constante na blacklist    \n","    filtered_list = []\n","    discarded_list = []\n","    \n","    for i in passlist:\n","        if (len(i) <= 1) or i == base_url: # Descarta se for so uma barra ou o url base do boticario\n","            discarded_list.append(i)\n","        elif i[:len(base_url)] == base_url: # Mantem se for um url do boticario\n","            filtered_list.append(i)\n","        elif i[:4] == 'http':\n","            discarded_list.append(i)\n","        elif i[0] == '/': # Monta o url completo\n","            filtered_list.append(base_url+i)\n","        elif i[0] != '/': # Monta o url completo\n","            filtered_list.append(base_url+'/'+i)\n","        else:\n","            discarded_list.append(i)\n","\n","    return filtered_list"]},{"cell_type":"code","execution_count":7,"metadata":{},"outputs":[],"source":["def get_filtered_links(seed_url, base_url, link_blacklist):\n","    r = session.get(seed_url)\n","\n","    return filter_links(r.html.links, link_blacklist, base_url)"]},{"cell_type":"code","execution_count":8,"metadata":{},"outputs":[],"source":["def link_type(session, link):\n","    try:\n","        page_type = link.split('/')[4].capitalize()\n","\n","    except Exception as e:\n","        page_type = \"Unknown\"\n","        if debug_mode:print(e)\n","    \n","    if debug_mode:\n","        print(\"Type: \", page_type)\n","\n","    return page_type"]},{"cell_type":"code","execution_count":9,"metadata":{},"outputs":[],"source":["def new_link(link, product_set, discard_set): # Verifica se o link ja foi visto ou nao\n","    new = not(link in product_set or link in discard_set)\n","    \n","    return new"]},{"cell_type":"code","execution_count":10,"metadata":{},"outputs":[],"source":["def get_product_links(session, link):\n","\n","    r = session.get(link)\n","    soup = BeautifulSoup(r.text, \"html.parser\")\n","\n","    lks = []\n","    pods = soup.find_all(\"div\", {\"pod-layout\":\"4_GRID\"})\n","\n","    for pod in pods:\n","        a = pod.find(\"a\", {\"class\":\"jsx-2907167179 layout_grid-view layout_view_4_GRID\"}).attrs['href']\n","\n","        if link_type(session, a) == \"Product\":\n","            lks.append(a)\n","\n","    return lks"]},{"cell_type":"code","execution_count":11,"metadata":{},"outputs":[],"source":["def product_mapper(session, seed_links, link_type_blacklist, link_blacklist, product_max):\n","    product_set = set() # Pilha de produtos\n","    discard_set = set() # Pilha de descarte\n","    seed_set = set(seed_links) # Pilha de links\n"," \n","    while (len(seed_set) > 0) and (len(product_set) < product_max):\n","        link = seed_set.pop() # Pega o primeiro link da lista\n","        \n","        if debug_mode:\n","            print(\"---------------------------------------\")\n","            print(\"Product stack: \", len(product_set))\n","            print(\"Discard stack: \", len(discard_set))\n","            print(\"Link stack: \", len(seed_set))\n","            print(\"Current link: \", link)\n","        \n","        p_links = get_product_links(session, link)\n","        \n","        old_size = len(product_set)       \n","\n","        for p in p_links: # Adiciona todos os produtos da pagina na pilha de produtos\n","            product_set.add(p)\n","\n","        new_size = len(product_set)\n","\n","        if debug_mode:\n","            print(new_size-old_size, \" new links added to product stack\")\n","\n","        discard_set.add(link)\n","    \n","    return product_set"]},{"cell_type":"markdown","metadata":{},"source":["# Pegando dados de um único produto\n","\n","Dados desejados:\n","- País\n","- Concorrente\n","- Data scrape\n","- ID produto\n","- Título\n","- Descrição\n","- Preço atual\n","- Preço antigo\n","- Desconto atual\n","- Moeda\n","- Disponibilidade\n","- Condição\n","- Departamento\n","- Categoria\n","- Marca\n","- Linha\n","- URL"]},{"cell_type":"code","execution_count":12,"metadata":{},"outputs":[],"source":["def get_item_data(session, link): # A partir da pagina do item, busca todas suas informacoes pertinentes\n","    r = session.get(link)\n","    \n","    item = BeautifulSoup(r.text, \"html.parser\")\n","    \n","    pais = \"Chile\"\n","    competidor = \"Falabella\"\n","    data = date.today().strftime(\"%d/%m/%Y\")\n","\n","    # ID\n","    try:\n","        id = link.split('/')[-1]\n","    except Exception as e:\n","        id = None\n","        if debug_mode:print(e)\n","\n","    # Title\n","    try:\n","        title = item.head.find(\"meta\", {\"property\":\"og:title\"}).attrs['content'].split('|')[0].strip()\n","    except Exception as e:\n","        title = None\n","        if debug_mode:print(e)\n","        \n","    # Description\n","    try:\n","        description = item.head.find(\"meta\", {\"name\":\"description\"}).attrs['content']\n","    except Exception as e:\n","        description = None\n","        if debug_mode:print(e)\n","        \n","    # Current price\n","    try:\n","        price = item.find(\"li\", {\"class\":\"jsx-749763969 prices-0\"}).attrs['data-event-price'].replace('.','')\n","        price = int(price)\n","    except Exception as e:\n","        price = None\n","        if debug_mode:print(e)\n","        \n","    # Previous price\n","    try:\n","        maxprice = item.find(\"li\", {\"class\":\"jsx-749763969 prices-1\"}).attrs['data-normal-price'].replace('.','')\n","        maxprice = int(maxprice)\n","    except Exception as e:\n","        maxprice = None\n","        if debug_mode:print(e)\n","        \n","    # Currency\n","    try:\n","        currency = 'CLP'\n","    except Exception as e:\n","        currency = None\n","        if debug_mode:print(e)\n","        \n","    # Seller\n","    try:\n","        seller = item.find(\"a\", {\"id\":\"testId-SellerInfo-sellerName\"}).attrs['href'].split('/')[-1]\n","        seller = unquote(unquote(seller))\n","    except Exception as e:\n","        seller = None\n","        if debug_mode:print(e)\n","        \n","    # URL\n","    url = link\n","\n","    # Other attributes\n","    try:\n","        attrs = item.find_all(\"tr\", {\"class\":\"jsx-428502957\"})\n","        tempDict = {}\n","        for att in attrs:\n","            k = att.contents[0].text\n","            v = att.contents[1].text\n","            tempDict[k] = v\n","\n","    except Exception as e:\n","        tempDict = {}\n","        if debug_mode:print(e)    \n","\n","    d = {\t\n","            \"País\":pais,\n","            \"Concorrente\":competidor,\n","            \"Data scrape\":data,\n","            \"ID produto\":id,\n","            \"Título\":title,\n","            \"Descrição\":description,\n","            \"Preço atual\":price,\n","            \"Preço antigo\":maxprice,\n","            \"Moeda\":currency,\n","            \"Vendedor\":seller,\n","            \"URL\":url\n","        }\n","\n","    d.update(tempDict) # Inclui demais atributos\n","\n","    return pd.Series(d)"]},{"cell_type":"code","execution_count":13,"metadata":{},"outputs":[],"source":["def get_all_items(session, links):\n","    df = pd.DataFrame()\n","    for link in links:\n","        try:\n","            item_data = get_item_data(session, link)\n","            df = df.append(item_data, ignore_index=True)\n","        except Exception as e:\n","            if debug_mode: print(e)\n","    return df"]},{"cell_type":"markdown","metadata":{},"source":["# Função Main"]},{"cell_type":"code","execution_count":14,"metadata":{},"outputs":[],"source":["#max_pages = 200\n","#product_max = 10_000_000\n","\n","def main(max_pages = 200, product_max = 10_000_000):\n","    \n","    session = HTMLSession()\n","    #asession = AsyncHTMLSession()\n","    base_url = \"https://www.falabella.com\"\n","    seed_url = \"https://www.falabella.com/falabella-cl/category/cat7660002/Belleza--higiene-y-salud\"\n","\n","    link_blacklist = []\n","    link_type_blacklist = ['Unknown']\n","\n","    \n","    # Scraping\n","    seed_links = []\n","    for i in range(1, max_pages+1):\n","        print(i)\n","        j = seed_url + '?page=' + str(i)\n","        seed_links.append(j)\n","    \n","    products = product_mapper(session, seed_links, link_type_blacklist, link_blacklist, product_max)\n","\n","    df = get_all_items(session, products)\n","    \n","    # Reordenando\n","    first = ['País', 'Concorrente', 'Data scrape', 'ID produto', 'Título', 'Descrição', 'Preço atual', 'Preço antigo', 'Moeda', 'Vendedor', 'URL'] \n","    cols = first + sorted([c for c in df.columns.to_list() if c not in first])   \n","\n","    try:\n","        df = df[cols]\n","    except Exception as e:\n","        if debug_mode: print(e)\n","    \n","    return df\n","\n","    #df.to_excel(\"../02_Results/\"+date.today().strftime(\"%Y_%m_%d\")+\"_\"+\"falabella.xlsx\")"]},{"cell_type":"code","execution_count":15,"metadata":{"scrolled":true},"outputs":[],"source":["df=main()"]},{"cell_type":"code","execution_count":16,"metadata":{},"outputs":[],"source":["Alteryx.write(df,1)"]},{"cell_type":"code","execution_count":null,"metadata":{},"outputs":[],"source":[]}],"metadata":{"kernelspec":{"display_name":"designerbasetools_venv","language":"python","name":"designerbasetools_venv"},"language_info":{"codemirror_mode":{"name":"ipython","version":3},"file_extension":".py","mimetype":"text/x-python","name":"python","nbconvert_exporter":"python","pygments_lexer":"ipython3","version":"3.8.5"}},"nbformat":4,"nbformat_minor":2}]]></Notebook>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+            <MetaInfo connection="Output1">
+              <RecordInfo>
+                <Field name="País" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Concorrente" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Data scrape" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="ID produto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Título" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Descrição" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Preço atual" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Preço antigo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Moeda" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Vendedor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="URL" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="6" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Acabado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ajustes De Intensidad " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Alimentación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Alto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Alto del anteojo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Alto mesa" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Alto producto empacado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Altura total" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ancho" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ancho producto empacado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ancho/Diámetro" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ancho/diámetro2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Apto para lavavajillas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Apto para microondas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Area De Aplicacion " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Aroma" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Aroma_" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Beneficio del producto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Beneficio del producto Piel" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Beneficios" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cable giratorio" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cable retráctil" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cantidad contenida en el empaque" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cantidad de ampolletas/tubos" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cantidad de refrigerante" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cantidad de repisas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Capacidad de enfriamiento" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Capacidad volumétrica" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Características" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cargador" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Clase de clima" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Color" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Composición" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condicion del producto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condiciones de almacenaje" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condiciones de la Garantía del Vendedor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condiciones de la garantía" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condición de venta" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Condición del producto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Conectividad/conexión" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Consumo energético" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Contenido" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Contenido (ml)" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Contenido del paquete" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Corta patilla desplegable" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cuenta con aromaterapia" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cuenta con control de temperatura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cuenta con humidificador" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cuenta con luz encendido" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Cuidados de la prenda" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Depilado bajo el agua" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Detalle de la Condición" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Detalle de la condición2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Detalle de la garantía" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Dificultad de armado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Dimensiones" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Diseño" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Diámetro" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Diámetro de cabezal" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Edad" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Edad mínima recomendada" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Efecto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Eficiencia energética" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Espacio recomendado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Estilo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Estilo deco" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Factor de protección solar" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Forma" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Forma del lente" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Forma farmacéutica" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Formato" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Formato belleza" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Formulación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Fragancia" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Fuente De Alimentacion" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Fuente de alimentación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Funcionalidad" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Función" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantia " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía de la base" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía del proveedor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía del proveedor_" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía en la estructura y resortes" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Garantía en telas y relleno" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Generador de iones" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Graduación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Graduación de los lentes" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Género" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Género de vestuario" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Hecho en" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Hipoalergénico" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Inalámbrica" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Incluye" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Incluye accesorios" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Incluye luz" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Información adicional" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Iones" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Laboratorio/proveedor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Largo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Largo del cable" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Largo producto empacado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Lavable" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Lente" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Longitud del cable" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Luz indicadora de encendido" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Manual de usuario" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Marca" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Marca Web" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material de la estructura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material de las placas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material de las tenazas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material del cojín" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material del lente" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material del marco" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Material principal" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Medida/volumen" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Medidas de la modelo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Modelo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Modelo (Internet)" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Modo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Momento De Uso" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Momento de uso2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Niveles de temperatura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Nombre comercial" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Notas de Fondo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Notas de Salida" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Notas de corazón" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Notas de fondo2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Notas de salida2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Numero De Disparos " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Número de cabezales" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Número de cajones" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Número de certificación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Número de pinzas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Número de pulsaciones" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Número de velocidades" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Opción de aire frío" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="País de origen" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Peso" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Peso del producto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Peso máximo del usuario" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Peso máximo soportado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Peso producto empacado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Posee Alcohol" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Posee Vaporizador" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Posee alcohol2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Posee sal" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Posee vaporizador2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Potencia" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Principio activo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Producto Perecible" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Producto libre de" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Profundidad" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Programas" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Protección UV" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Recargable" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Recomendaciones" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Recomendaciones de cuidado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Recomendaciones de uso" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Reconocimiento De Piel " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Registro INVIMA" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Registro sanitario" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Requiere armado" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Resolución/Autorización ISP" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Resultados " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Rosca" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Rotaciones por minuto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Selector de velocidades" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Sensor De Seguridad " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Sistema De Depilado " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Sistema de Bloqueo para viaje" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Sistema de bloqueo para viaje2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Sistema de enfriamiento" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="TIEMPO DE CARGA" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Talla" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tecnología" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tecnología inverter" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Temperatura máxima" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Temporada" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Temporizador" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Terminación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Testeado en animales" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Textura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tiempo de carga2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tiempo de recarga" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tiempo de uso" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Timer De Apagado " size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo De Piel" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de Piel2" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de Suplemento" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de cabello" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de cabezal" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de cabezales" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de cable" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de cama compatible" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de equipamiento médico" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de instalación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de jabón" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de lámpara" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de maquillaje para ojos" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de maquillaje para rostro" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de masajeador" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de motor" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de pantalla" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de perfume" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de piel3" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de producto" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de tratamiento de cabello" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de utensilio de cocina" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tipo de vitamina" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Tono" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Ubicación de equipos de ventilación" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Unidad de medida" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Unidades" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Uso" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Vida útil del cabezal" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Voltaje" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Área de cobertura" size="1073741823" source="PythonTool:" type="V_WString" />
+                <Field name="Área de uso" size="1073741823" source="PythonTool:" type="V_WString" />
+              </RecordInfo>
+            </MetaInfo>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxJupyterPluginEngine.dll" EngineDllEntryPoint="AlteryxJupyter" />
+        </Node>
+        <Node ToolID="2">
+          <GuiSettings Plugin="AlteryxBasePluginsGui.AlteryxSelect.AlteryxSelect">
+            <Position x="175" y="103" />
+          </GuiSettings>
+          <Properties>
+            <Configuration>
+              <OrderChanged value="False" />
+              <CommaDecimal value="False" />
+              <SelectFields>
+                <SelectField field="Textura" selected="False" />
+                <SelectField field="*Unknown" selected="True" />
+              </SelectFields>
+            </Configuration>
+            <Annotation DisplayMode="0">
+              <Name />
+              <DefaultAnnotationText />
+              <Left value="False" />
+            </Annotation>
+          </Properties>
+          <EngineSettings EngineDll="AlteryxBasePluginsEngine.dll" EngineDllEntryPoint="AlteryxSelect" />
+        </Node>
+      </ChildNodes>
+    </Node>
+  </Nodes>
+  <Connections>
+    <Connection>
+      <Origin ToolID="9" Connection="Output" />
+      <Destination ToolID="10" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="10" Connection="Output" />
+      <Destination ToolID="11" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="5" Connection="Output1" />
+      <Destination ToolID="6" Connection="Input" />
+    </Connection>
+    <Connection name="#2">
+      <Origin ToolID="6" Connection="Output" />
+      <Destination ToolID="9" Connection="Input" />
+    </Connection>
+    <Connection name="#1">
+      <Origin ToolID="2" Connection="Output" />
+      <Destination ToolID="9" Connection="Input" />
+    </Connection>
+    <Connection>
+      <Origin ToolID="1" Connection="Output1" />
+      <Destination ToolID="2" Connection="Input" />
+    </Connection>
+  </Connections>
+  <Properties>
+    <Memory default="True" />
+    <GlobalRecordLimit value="0" />
+    <TempFiles default="True" />
+    <Annotation on="True" includeToolName="False" />
+    <ConvErrorLimit value="10" />
+    <ConvErrorLimit_Stop value="False" />
+    <CancelOnError value="False" />
+    <DisableBrowse value="False" />
+    <EnablePerformanceProfiling value="False" />
+    <RunWithE2 value="True" />
+    <PredictiveToolsCodePage value="1252" />
+    <DisableAllOutput value="False" />
+    <ShowAllMacroMessages value="False" />
+    <ShowConnectionStatusIsOn value="True" />
+    <ShowConnectionStatusOnlyWhenRunning value="True" />
+    <ZoomLevel value="0" />
+    <LayoutType>Horizontal</LayoutType>
+    <MetaInfo>
+      <NameIsFileName value="True" />
+      <Name>Webscraper</Name>
+      <Description />
+      <RootToolName />
+      <ToolVersion />
+      <ToolInDb value="False" />
+      <CategoryName />
+      <SearchTags />
+      <Author />
+      <Company />
+      <Copyright />
+      <DescriptionLink actual="" displayed="" />
+      <Example>
+        <Description />
+        <File />
+      </Example>
+      <WorkflowId value="f1c375ce-ed53-434c-a904-bd487da74826" />
+      <Telemetry>
+        <PreviousWorkflowId value="4d4c8192-727a-4df8-b721-6a57a8053f52" />
+        <OriginWorkflowId value="4d4c8192-727a-4df8-b721-6a57a8053f52" />
+      </Telemetry>
+      <PlatformWorkflowId value="" />
+    </MetaInfo>
+    <Events>
+      <Enabled value="True" />
+    </Events>
+  </Properties>
+</AlteryxDocument>
